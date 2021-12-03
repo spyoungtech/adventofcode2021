@@ -4,61 +4,49 @@ import argparse
 import os.path
 
 import pytest
-
+from typing import Literal
 from support import timing
 
 INPUT_TXT = os.path.join(os.path.dirname(__file__), 'input.txt')
+
+RATING_SELECTION = Literal['co2', 'o2']
+
+
+def get_rating(lines, which_rating: RATING_SELECTION) -> int:
+    for position in range(len(lines[0])):
+        bits = [line[position] for line in lines]
+        n_zero = bits.count('0')
+        n_one = len(bits) - n_zero
+        if n_zero > n_one:
+            oxygen = '0'
+            co = '1'
+        else:
+            oxygen = '1'
+            co = '0'
+
+        if which_rating == 'o2':
+            rating = oxygen
+        elif which_rating == 'co2':
+            rating = co
+        else:
+            raise ValueError("which_rating must be 'o2' or 'co'")
+
+        considered = []
+        for line in lines:
+            if line[position] == rating:
+                considered.append(line)
+        lines = considered
+        if len(lines) == 1:
+            break
+    return int(lines[0], 2)
 
 
 def compute(s: str) -> int:
     lines = s.splitlines()
 
-    # Oxygen rating
-    filtered_lines = lines[::]
-    for position in range(len(lines[0])):
-        bits = [line[position] for line in filtered_lines]
-        n_zero = bits.count('0')
-        n_one = bits.count('1')
-        if n_zero > n_one:
-            oxygen = '0'
-            co = '1'
-        else:
-            oxygen = '1'
-            co = '0'
+    ox_rating = get_rating(lines, 'o2')
+    co_rating = get_rating(lines, 'co2')
 
-        considered = []
-        for line in filtered_lines:
-            if line[position] == oxygen:
-                considered.append(line)
-        filtered_lines = considered
-        if len(filtered_lines) == 1:
-            break
-    ox_rating = int(filtered_lines[0], 2)
-
-    # CO rating
-    # XXX: can this be made DRY?
-    filtered_lines = lines[::]
-    for position in range(len(lines[0])):
-        bits = [line[position] for line in filtered_lines]
-        n_zero = bits.count('0')
-        n_one = bits.count('1')
-        if n_zero > n_one:
-            oxygen = '0'
-            co = '1'
-        else:
-            oxygen = '1'
-            co = '0'
-
-        considered = []
-        for line in filtered_lines:
-            if line[position] == co:
-                considered.append(line)
-        filtered_lines = considered
-        if len(filtered_lines) == 1:
-            break
-    co_rating = int(filtered_lines[0], 2)
-
-    # power
     return co_rating * ox_rating
 
 
