@@ -4,19 +4,24 @@ import argparse
 import os.path
 
 import pytest
-from typing import Literal
+from typing import Literal, Sequence
 from support import timing
+from collections import Counter
 
 INPUT_TXT = os.path.join(os.path.dirname(__file__), 'input.txt')
 
 RATING_SELECTION = Literal['co2', 'o2']
 
 
-def get_rating(lines, which_rating: RATING_SELECTION) -> int:
-    for position in range(len(lines[0])):
-        bits = [line[position] for line in lines]
-        n_zero = bits.count('0')
-        n_one = len(bits) - n_zero
+def get_rating(lines: Sequence[str], which_rating: RATING_SELECTION) -> int:
+    width = len(lines[0])
+    for position in range(width):
+        bits = Counter()
+        for line in lines:
+            bits[line[position]] += 1
+
+        n_zero = bits['0']
+        n_one = bits['1']
         if n_zero > n_one:
             oxygen = '0'
             co = '1'
