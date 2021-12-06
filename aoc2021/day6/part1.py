@@ -24,18 +24,6 @@ class Lanternfish:
             self.timer = 6
             BROODING_POOL.append(Lanternfish())
 
-    def __repr__(self):
-        return repr(self.timer)
-
-    def __eq__(self, other):
-        return self.timer == other.timer
-
-    def __lt__(self, other):
-        return self.timer < other.timer
-
-    def __gt__(self, other):
-        return self.timer > other.timer
-
 
 def advance_day():
     for f in LANTERNFISH:
@@ -49,8 +37,7 @@ def compute(s: str) -> int:
     starting_timers = [int(a) for a in s.split(',') if a]
     for t in starting_timers:
         LANTERNFISH.append(Lanternfish(t))
-    for _ in range(10):
-        print(len(LANTERNFISH), sorted(LANTERNFISH))
+    for _ in range(80):
         advance_day()
     return len(LANTERNFISH)
 
